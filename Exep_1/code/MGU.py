@@ -50,7 +50,7 @@ class Clause:
 
 
 # 规定变量是小写字母，且只能是u~z
-def is_var(x: str) -> bool:
+def is_var(x) :
     return re.match(r"^[u-z]$", x) is not None
 
 
@@ -119,15 +119,15 @@ def resolve(c1: Clause, c2: Clause):
     return results
 
 #从Clasue类转换为字符串
-def clause_convert(clause: Clause):
+def clause_convert(clause):
     return tuple(lit.get_pred_str() for lit in clause.literals)
 
 
-def is_empty_clause(clause: Clause):
+def is_empty_clause(clause):
     return len(clause.literals) == 0
 
 #处理输入
-def input_process(in_str: str):
+def input_process(in_str):
     s = in_str.strip().strip("{}")
     clause_strs = []
     i = 0
@@ -295,7 +295,8 @@ def resolution_step(clause_list):
 
 
 def main():
-    in_str = input("请输入子句集：\n")
+    default_input = "{(A(tony),),(A(mike),),(A(john),),(L(tony, rain),),(L(tony, snow),),(~A(x), S(x), C(x)),(~C(y), ~L(y, rain)),(L(z, snow), ~S(z)),(~L(tony, u), ~L(mike, u)),(L(tony, v), L(mike, v)),(~A(w), ~C(w), S(w))}"
+    in_str = input(f"请输入子句集或使用默认输入(Alpine Club)：") or default_input
     clause_list = input_process(in_str)
 
     steps = resolution_step(clause_list)
