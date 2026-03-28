@@ -1,0 +1,8 @@
+1.
+{(P(a,z),),(A(x),),(~P(y,mike),~A(tony))}
+2.
+{(GradStudent(sue),),(~GradStudent(x),Student(x)),(~Student(x),HardWorker(x)),(~HardWorker(sue),)}
+3.
+{(On(tony,mike),),(On(mike,john),),(Green(tony),),(~Green(john),),(~On(x,y),~Green(x),Green(y))}
+4.
+{(A(tony),),(A(mike),),(A(john),),(L(tony, rain),),(L(tony, snow),),(~A(x), S(x), C(x)),(~C(y), ~L(y, rain)),(L(z, snow), ~S(z)),(~L(tony, u), ~L(mike, u)),(L(tony, v), L(mike, v)),(~A(w), ~C(w), S(w))}
