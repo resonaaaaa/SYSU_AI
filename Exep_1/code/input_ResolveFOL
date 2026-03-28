@@ -1,0 +1,4 @@
+1.
+{(A,~C),(~B,), (B,C)
+2.
+{(FirstGrade,),(~FirstGrade,Student),(~Student,HardWorker),(~HardWorker,)}}
