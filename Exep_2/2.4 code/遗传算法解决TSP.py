@@ -163,9 +163,9 @@ class GeneticAlgorithm:
 
 
 def main():
-    f_path = "E:\projects\Python\SYSU_AI\Exep_2\code\data2.txt"    
+    f_path = "E:\projects\Python\SYSU_AI\Exep_2\\2.4 code\data1.txt"    
     ga = GeneticAlgorithm(pop_size=100, file_path=str(f_path))
-    best, best_distance = ga.run(generations=300, gap=20)
+    best, best_distance = ga.run(generations=300)
     print("最终结果:")
     print(f"最优路径长度: {best_distance:.4f}")
     print("最优路径:", ga.get_route(best))
