@@ -1,6 +1,6 @@
 import random
 import math
-from pathlib import Path
+
 
 class City:
     def __init__(self, index, x, y):
@@ -78,7 +78,7 @@ class GeneticAlgorithm:
         current = 0
         for indiv in population:
             current += fitness_func(indiv)
-            if current > pick:
+            if current > pick:  #选择适应度较高的个体
                 return indiv
         return population[-1]
 
@@ -123,27 +123,30 @@ class GeneticAlgorithm:
     def best_individual(self, population):
         return max(population, key=self.fitness)
 
-    def format_route(self, individual):
-        return [self.cities[i].index for i in individual]
+    def get_route(self, individual):
+        route = []
+        for city in individual:
+            route.append(self.cities[city].index)
+        return route
 
     def print_result(self, population, generation=None):
         best = self.best_individual(population)
         best_distance = self.route_distance(best)
-        route = self.format_route(best)
+        route = self.get_route(best)
         if generation is None:
             print(f"最优路径长度: {best_distance:.4f}")
         else:
             print(f"第 {generation} 代最优路径长度: {best_distance:.4f}")
-        print("最优路径(城市编号):", route)
+        print("最优路径:", route)
         return best, best_distance, route
 
-    def run(self, generations=500, verbose=False):
+    #主循环，默认迭代300代，默认每50代打印一次结果
+    def run(self, generations=300, gap = 50):
         population = self.population
         best = self.best_individual(population)
         best_distance = self.route_distance(best)
-        if verbose:
-            print("初始种群:")
-            self.print_result(population, generation=0)
+        print("初始种群:")
+        self.print_result(population, generation=0)
 
         for generation in range(1, generations + 1):
             population = self.evolve(population, self.fitness)
@@ -152,7 +155,7 @@ class GeneticAlgorithm:
             if current_distance < best_distance:
                 best = current_best
                 best_distance = current_distance
-            if verbose and generation % 50 == 0:
+            if generation % gap == 0: #每50代打印一次结果
                 self.print_result(population, generation=generation)
 
         self.population = population
@@ -160,12 +163,12 @@ class GeneticAlgorithm:
 
 
 def main():
-    data_file = Path(__file__).resolve().parent / "data1.txt"
-    ga = GeneticAlgorithm(pop_size=100, file_path=str(data_file))
-    best, best_distance = ga.run(generations=500, verbose=True)
+    f_path = "E:\projects\Python\SYSU_AI\Exep_2\code\data2.txt"    
+    ga = GeneticAlgorithm(pop_size=100, file_path=str(f_path))
+    best, best_distance = ga.run(generations=300, gap=20)
     print("最终结果:")
     print(f"最优路径长度: {best_distance:.4f}")
-    print("最优路径(城市编号):", ga.format_route(best))
+    print("最优路径:", ga.get_route(best))
 
 if __name__ == "__main__":
     main()
