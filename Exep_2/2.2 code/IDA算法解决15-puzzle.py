@@ -21,12 +21,18 @@ class PuzzleState:
             (13, 14, 15, 0),
         )
         if self.solvable():
-            self.h_value = self.h() 
+            self.h_value = self.h()
+        else:
+            self.h_value = float('inf') 
+
 
     def __lt__(self, other):
         return self.f() < other.f()  #用于优先队列
 
-    #判断当前状态是否可解
+    """
+    判断当前状态是否可解，可解性与逆序数和空格所在行数有关。
+    如果逆序数为偶数且空格在奇数行，或者逆序数为奇数且空格在偶数行，则可解。
+    """
     def solvable(self):
         #计算逆序数
         flat_board = [num for row in self.board for num in row if num != 0]
@@ -75,6 +81,8 @@ class PuzzleState:
         return tuple(tuple(row) for row in self.board)  #将二维列表转换为不可变的元组，方便加入set中
     
 def ida_star(state, threshold, visited):
+    if not state.solvable():
+        return -2
     if state.board_to_tuple() in visited:
         return float('inf')  #已经访问过
     visited.add(state.board_to_tuple())
@@ -106,10 +114,10 @@ def main():
     start_board = [
     [3,13,4,12],
     [2,5,7,10],
-    [15,6,8,14],
-    [0,1,11,9],
+    [8,0,6,14],
+    [15,1,11,9],
 ] 
-    space_pos = (3,0)  #空格的位置
+    space_pos = (2,1)  #空格的位置
     start_state = PuzzleState(start_board, move=0, space_pos=space_pos)
     result = ida_star(start_state, start_state.h_value, set())
     if result >= 0:
