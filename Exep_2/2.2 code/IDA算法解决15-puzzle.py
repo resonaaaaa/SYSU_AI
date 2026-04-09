@@ -55,7 +55,7 @@ class PuzzleState:
             moves.append((x, y + 1))
         return moves
     
-    #启发函数，计算曼哈顿距离
+    #曼哈顿距离
     def h(self):
         res = 0
         for i in range(self.size):
@@ -74,56 +74,32 @@ class PuzzleState:
     def board_to_tuple(self):
         return tuple(tuple(row) for row in self.board)  #将二维列表转换为不可变的元组，方便加入set中
     
-def run(start_state, max_search=2000000):
-    if not start_state.solvable():
-        return -2  #如果不可解，直接返回-2
-    
-    best_g = {start_state.board_to_tuple(): 0}  #记录每个状态当前已知的最优步数
-    visited_set = set()  #已经访问过的状态
-    search = 0
-
-    queue = [(start_state.f(), start_state.move, start_state)] #优先队列按照f值排序
-
-    while queue:
-        if search % 100000 == 0:
-            print(f"已搜索状态数: {search}")
-
-        if search > max_search:
-            return -1  #如果搜索超限，返回-1
-        _, _, current_state = heapq.heappop(queue)  #取出f值最小的状态
-        current_key = current_state.board_to_tuple()
-
-        #如果当前状态不是最优步数，跳过
-        if current_state.move != best_g.get(current_key, float('inf')):
-            continue  
-        
-        if current_key in visited_set:
-            continue  #如果已经访问过，跳过
-        visited_set.add(current_key)  #将当前状态加入已访问集合
-        search += 1
-
-        if current_key == current_state.goal_tuple:
-            return current_state.move  #如果达到目标状态，返回移动步数
-        
-        for move in current_state.get_possible_moves():
-            import copy
-            new_board = copy.deepcopy(current_state.board)  #复制当前棋盘
-            x, y = current_state.space_pos
-            new_x, new_y = move
-            #交换空格和目标位置的数字
-            new_board[x][y], new_board[new_x][new_y] = new_board[new_x][new_y], new_board[x][y]
-            new_state = PuzzleState(new_board, current_state.move + 1, (new_x, new_y))  #创建新状态
-            new_key = new_state.board_to_tuple()
-            
-            if new_key in visited_set:
-                continue  #如果新状态已经访问过，跳过
-            
-            #如果新状态的步数更优，更新best_g并加入优先队列
-            if new_state.move < best_g.get(new_key, float('inf')):
-                best_g[new_key] = new_state.move  
-                heapq.heappush(queue, (new_state.f(), new_state.move, new_state))  #将新状态加入优先队列
-
-    return -1  #如果搜索完所有状态仍未找到解，返回-1
+def ida_star(state, threshold, visited):
+    if state.board_to_tuple() in visited:
+        return float('inf')  #已经访问过
+    visited.add(state.board_to_tuple())
+    f_value = state.f()
+    if f_value > threshold:
+        return f_value  #超过当前阈值，返回f值
+    if state.board == state.goal_tuple:
+        return state.move  #找到解，返回移动步数
+    min_threshold = float('inf')
+    for move in state.get_possible_moves():
+        import copy
+        new_board = copy.deepcopy(state.board)  #深复制
+        x, y = state.space_pos
+        new_x, new_y = move
+        #交换空格和目标位置的数字
+        new_board[x][y], new_board[new_x][new_y] = new_board[new_x][new_y], new_board[x][y]
+        new_state = PuzzleState(new_board, state.move + 1, (new_x, new_y))
+        if not new_state.solvable():
+            continue  #如果新状态不可解，跳过
+        result = ida_star(new_state, threshold, visited)
+        if result == -1:
+            return -1  #搜索超限，未找到解
+        min_threshold = min(min_threshold, result)
+    visited.remove(state.board_to_tuple())  #回溯，移除当前状态
+    return min_threshold
 
    
 def main():
@@ -135,7 +111,7 @@ def main():
 ] 
     space_pos = (3,0)  #空格的位置
     start_state = PuzzleState(start_board, move=0, space_pos=space_pos)
-    result = run(start_state, 200000)
+    result = ida_star(start_state, start_state.h_value, set())
     if result >= 0:
         print(f"移动步数: {result}")
     elif result == -1:
