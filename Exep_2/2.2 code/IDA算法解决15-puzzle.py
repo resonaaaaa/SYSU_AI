@@ -1,6 +1,5 @@
 """
 通过A*算法解决15-puzzle问题，启发式函数使用曼哈顿距离。
-https://www.luogu.com.cn/article/d22yv1jh
 """
 import heapq
 
@@ -25,9 +24,6 @@ class PuzzleState:
         else:
             self.h_value = float('inf') 
 
-
-    def __lt__(self, other):
-        return self.f() < other.f()  #用于优先队列
 
     """
     判断当前状态是否可解，可解性与逆序数和空格所在行数有关。
@@ -105,7 +101,7 @@ def ida_star(state, threshold, visited):
         result = ida_star(new_state, threshold, visited)
         if result == -1:
             return -1  #搜索超限，未找到解
-        min_threshold = min(min_threshold, result)
+        min_threshold = min(min_threshold, result) #更新最小阈值
     visited.remove(state.board_to_tuple())  #回溯，移除当前状态
     return min_threshold
 
@@ -114,10 +110,10 @@ def main():
     start_board = [
     [3,13,4,12],
     [2,5,7,10],
-    [8,0,6,14],
-    [15,1,11,9],
+    [15,6,8,14],
+    [0,1,11,9],
 ] 
-    space_pos = (2,1)  #空格的位置
+    space_pos = (3,0)  #空格的位置
     start_state = PuzzleState(start_board, move=0, space_pos=space_pos)
     result = ida_star(start_state, start_state.h_value, set())
     if result >= 0:
